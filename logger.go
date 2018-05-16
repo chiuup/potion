@@ -49,13 +49,13 @@ func loggerHandler(next http.HandlerFunc) http.HandlerFunc {
 		defer loggerPanicHandler(lrw, r)
 
 		next.ServeHTTP(lrw, r)
+
 		logLine := buildLogLine(r.Method, r.RequestURI, lrw.startTime, lrw.statusCode, lrw.length)
 		if lrw.statusCode < http.StatusBadRequest {
 			glog.Infof("%s", logLine)
 		} else {
 			glog.Errorf("%s", logLine)
 		}
-		glog.Flush()
 	}
 }
 
@@ -66,6 +66,5 @@ func loggerPanicHandler(lrw *loggerResponseWriter, r *http.Request) {
 		Error(lrw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		logLine := buildLogLine(r.Method, r.RequestURI, lrw.startTime, lrw.statusCode, lrw.length)
 		glog.Errorf("%s", logLine)
-		glog.Flush()
 	}
 }
